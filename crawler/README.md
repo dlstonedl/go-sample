@@ -2,9 +2,7 @@
 go get golang.org/x/text  
 go get golang.org/x/net/html
 
-export GO111MODULE=on
-go mod init github.com/dlstonedl/go-sample/crawler
-go mod download
+git clone --branch 7.x https://github.com/elastic/go-elasticsearch.git $GOPATH/src/github.com/elastic/go-elasticsearch/v7
 
 ####docker:
 docker ps -a
@@ -19,6 +17,8 @@ docker run -d -p 9200:9200 -e "discovery.type=single-node" elasticsearch:7.0.0
 
 ###elasticsearch:
 localhost:9200
+GET http://localhost:9200/crawler/_doc/{id}?pretty=true
+GET http://localhost:9200/crawler/_search?pretty=true
 
 ###architecture-diagram: 
 starUML

@@ -7,7 +7,7 @@ import (
 )
 
 func TestParseCity(t *testing.T) {
-	file, err := os.Open("city_test.html")
+	file, err := os.Open("city_test.txt")
 	if err != nil {
 		panic(err)
 	}

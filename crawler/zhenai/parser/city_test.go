@@ -13,7 +13,7 @@ func TestParseCity(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	parseResult := ParseCity(contents)
+	parseResult := ParseCity(contents, "")
 
 	var items = []string{
 		"静听雨声", "那些感觉", "Trytosmil",

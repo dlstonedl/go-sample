@@ -13,5 +13,5 @@ func TestParseProfile(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	ParseProfile(contents)
+	ParseProfile(contents, "", "")
 }

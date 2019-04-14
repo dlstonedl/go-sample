@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/dlstonedl/go-sample/crawler/model"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -13,5 +14,24 @@ func TestParseProfile(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	ParseProfile(contents, "", "")
+	parseResult := ParseProfile(contents, "Name", "City")
+
+	profile := model.Profile{
+		Name:      "Name",
+		City:      "City",
+		Gender:    "男",
+		Age:       "20",
+		Height:    "177cm",
+		Weight:    "60kg",
+		Income:    "3千以下",
+		Marriage:  "未婚",
+		Education: "高中及以下",
+		Nation:    "汉族",
+	}
+
+	if len(parseResult.Items) != 1 || profile != parseResult.Items[0] {
+		t.Errorf("parseResult.Items: len=%d, item=%v, except len=%d, item=%v",
+			len(parseResult.Items), parseResult.Items[0], 1, profile)
+	}
+
 }

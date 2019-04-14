@@ -6,18 +6,21 @@ import (
 	"regexp"
 )
 
-var ageRe = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+)岁</div>`)
-var marriageRe = regexp.MustCompile(`<div class="m-btn purple"[^>]*>(未婚|离异)</div>`)
-var heightRe = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+cm)</div>`)
-var weightRe = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+kg)</div>`)
-var genderRe = regexp.MustCompile(`"genderString":"(男|女)士"`)
-var educationRe = regexp.MustCompile(`"educationString":"([^"]+)"`)
-var incomeRe = regexp.MustCompile(`<div class="m-btn purple"[^>]*>月收入:([^<]+)</div>`)
-var nationRe = regexp.MustCompile(`<div class="m-btn pink"[^>]*>([^>]+族)</div>`)
-var carRe = regexp.MustCompile(`<div class="m-btn pink"[^>]*>(已买车)</div>`)
-var houseRe = regexp.MustCompile(`<div class="m-btn pink"[^>]*>(已购房)</div>`)
+var (
+	ageRe       = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+)岁</div>`)
+	marriageRe  = regexp.MustCompile(`<div class="m-btn purple"[^>]*>(未婚|离异)</div>`)
+	heightRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+cm)</div>`)
+	weightRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+kg)</div>`)
+	genderRe    = regexp.MustCompile(`"genderString":"(男|女)士"`)
+	educationRe = regexp.MustCompile(`"educationString":"([^"]+)"`)
+	incomeRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>月收入:([^<]+)</div>`)
+	nationRe    = regexp.MustCompile(`<div class="m-btn pink"[^>]*>([^>]+族)</div>`)
+	carRe       = regexp.MustCompile(`<div class="m-btn pink"[^>]*>(已买车)</div>`)
+	houseRe     = regexp.MustCompile(`<div class="m-btn pink"[^>]*>(已购房)</div>`)
+	useCityRe   = regexp.MustCompile(`<div class="des f-cl"[^>]*>([^ ]+) [^<]*</div>`)
+)
 
-func ParseProfile(contents []byte, name string, city string) engine.ParseResult {
+func ParseProfile(contents []byte, name string) engine.ParseResult {
 	result := engine.ParseResult{}
 
 	profile := model.Profile{}
@@ -31,8 +34,8 @@ func ParseProfile(contents []byte, name string, city string) engine.ParseResult 
 	profile.Car = extractString(carRe, contents)
 	profile.House = extractString(houseRe, contents)
 	profile.Nation = extractString(nationRe, contents)
+	profile.City = extractString(useCityRe, contents)
 	profile.Name = name
-	profile.City = city
 
 	result.Items = append(result.Items, profile)
 	return result

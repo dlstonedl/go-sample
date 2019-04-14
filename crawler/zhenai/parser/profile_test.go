@@ -14,11 +14,11 @@ func TestParseProfile(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	parseResult := ParseProfile(contents, "Name", "City")
+	parseResult := ParseProfile(contents, "Name")
 
 	profile := model.Profile{
 		Name:      "Name",
-		City:      "City",
+		City:      "阿坝",
 		Gender:    "男",
 		Age:       "20",
 		Height:    "177cm",

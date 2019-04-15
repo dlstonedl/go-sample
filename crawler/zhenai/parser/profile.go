@@ -22,8 +22,6 @@ var (
 )
 
 func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
-	result := engine.ParseResult{}
-
 	profile := model.Profile{}
 	profile.Age = extractString(ageRe, contents)
 	profile.Marriage = extractString(marriageRe, contents)
@@ -36,11 +34,16 @@ func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 	profile.House = extractString(houseRe, contents)
 	profile.Nation = extractString(nationRe, contents)
 	profile.City = extractString(useCityRe, contents)
-	profile.Id = extractString(idRe, []byte(url))
 	profile.Name = name
-	profile.Url = url
 
-	result.Items = append(result.Items, profile)
+	item := engine.Item{}
+	item.Url = url
+	item.Id = extractString(idRe, []byte(url))
+	item.Type = "zhenai"
+	item.Data = profile
+
+	result := engine.ParseResult{}
+	result.Items = append(result.Items, item)
 	return result
 }
 

@@ -14,9 +14,11 @@ func TestParseProfile(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	parseResult := ParseProfile(contents, "Name")
+	parseResult := ParseProfile(contents, "Name", "http://album.zhenai.com/u/1129992868")
 
 	profile := model.Profile{
+		Id:        "1129992868",
+		Url:       "http://album.zhenai.com/u/1129992868",
 		Name:      "Name",
 		City:      "阿坝",
 		Gender:    "男",

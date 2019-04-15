@@ -18,9 +18,10 @@ var (
 	carRe       = regexp.MustCompile(`<div class="m-btn pink"[^>]*>(已买车)</div>`)
 	houseRe     = regexp.MustCompile(`<div class="m-btn pink"[^>]*>(已购房)</div>`)
 	useCityRe   = regexp.MustCompile(`<div class="des f-cl"[^>]*>([^ ]+) [^<]*</div>`)
+	idRe        = regexp.MustCompile(`http://album.zhenai.com/u/([0-9]+)`)
 )
 
-func ParseProfile(contents []byte, name string) engine.ParseResult {
+func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 	result := engine.ParseResult{}
 
 	profile := model.Profile{}
@@ -35,7 +36,9 @@ func ParseProfile(contents []byte, name string) engine.ParseResult {
 	profile.House = extractString(houseRe, contents)
 	profile.Nation = extractString(nationRe, contents)
 	profile.City = extractString(useCityRe, contents)
+	profile.Id = extractString(idRe, []byte(url))
 	profile.Name = name
+	profile.Url = url
 
 	result.Items = append(result.Items, profile)
 	return result

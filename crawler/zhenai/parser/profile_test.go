@@ -15,7 +15,7 @@ func TestParseProfile(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	parseResult := ParseProfile(contents, "Name", "http://album.zhenai.com/u/1129992868")
+	parseResult := ParseProfile(contents, "http://album.zhenai.com/u/1129992868", "Name")
 
 	item := engine.Item{
 		Url:  "http://album.zhenai.com/u/1129992868",

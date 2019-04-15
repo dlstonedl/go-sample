@@ -21,7 +21,7 @@ var (
 	idRe        = regexp.MustCompile(`http://album.zhenai.com/u/([0-9]+)`)
 )
 
-func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
+func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
 	profile := model.Profile{}
 	profile.Age = extractString(ageRe, contents)
 	profile.Marriage = extractString(marriageRe, contents)
@@ -36,13 +36,7 @@ func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 	profile.City = extractString(useCityRe, contents)
 	profile.Name = name
 
-	item := engine.Item{}
-	item.Url = url
-	item.Id = extractString(idRe, []byte(url))
-	item.Type = "zhenai"
-	item.Data = profile
-
-	result := engine.ParseResult{
+	return engine.ParseResult{
 		Items: []engine.Item{
 			{
 				Url:  url,
@@ -52,7 +46,6 @@ func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 			},
 		},
 	}
-	return result
 }
 
 func extractString(re *regexp.Regexp, contents []byte) string {
@@ -61,4 +54,10 @@ func extractString(re *regexp.Regexp, contents []byte) string {
 		return string(m[1])
 	}
 	return ""
+}
+
+func ProfileParser(name string) engine.ParseFunc {
+	return func(contents []byte, url string) engine.ParseResult {
+		return ParseProfile(contents, url, name)
+	}
 }

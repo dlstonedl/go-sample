@@ -14,7 +14,7 @@ func TestParseCityList(t *testing.T) {
 	defer file.Close()
 
 	contents, err := ioutil.ReadAll(file)
-	parseResult := ParseCityList(contents)
+	parseResult := ParseCityList(contents, "")
 
 	var requests = [3]string{
 		"http://www.zhenai.com/zhenghun/aba",

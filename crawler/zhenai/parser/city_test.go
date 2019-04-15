@@ -13,7 +13,7 @@ func TestParseCity(t *testing.T) {
 	}
 
 	contents, err := ioutil.ReadAll(file)
-	parseResult := ParseCity(contents)
+	parseResult := ParseCity(contents, "")
 
 	if len(parseResult.Requests) != 98 {
 		t.Errorf("parseResult.Requests len is %d ,expect %d",

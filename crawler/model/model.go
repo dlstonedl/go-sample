@@ -19,10 +19,10 @@ type Profile struct {
 	Constellation string
 }
 
-func GetProfileFromJson(o interface{}) (Profile, error) {
+func GetProfileFromJson(obj interface{}) (Profile, error) {
 	var profile Profile
 
-	bytes, err := json.Marshal(o)
+	bytes, err := json.Marshal(obj)
 	if err != nil {
 		return profile, err
 	}

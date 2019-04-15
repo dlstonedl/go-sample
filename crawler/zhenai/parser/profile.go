@@ -42,8 +42,16 @@ func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 	item.Type = "zhenai"
 	item.Data = profile
 
-	result := engine.ParseResult{}
-	result.Items = append(result.Items, item)
+	result := engine.ParseResult{
+		Items: []engine.Item{
+			{
+				Url:  url,
+				Id:   extractString(idRe, []byte(url)),
+				Type: "zhenai",
+				Data: profile,
+			},
+		},
+	}
 	return result
 }
 

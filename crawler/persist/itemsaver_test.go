@@ -29,12 +29,12 @@ func TestSave(t *testing.T) {
 		},
 	}
 
-	id, err := save(expected)
+	err := save(expected)
 	if err != nil {
 		panic(err)
 	}
 
-	query := "_id:" + id
+	query := "_id:" + expected.Id
 	fmt.Printf("query is %s\n", query)
 
 	es, err := elasticsearch.NewDefaultClient()
@@ -42,7 +42,7 @@ func TestSave(t *testing.T) {
 		es.Search.WithContext(context.Background()),
 		es.Search.WithQuery(query),
 		es.Search.WithIndex("crawler"),
-		es.Search.WithDocumentType("zhenai"),
+		es.Search.WithDocumentType(expected.Type),
 		es.Search.WithPretty(),
 	)
 	defer response.Body.Close()
@@ -66,15 +66,7 @@ func TestSave(t *testing.T) {
 		panic(err)
 	}
 
-	bytes, err = json.Marshal(source["Data"])
-	if err != nil {
-		panic(err)
-	}
-	var profile model.Profile
-	err = json.Unmarshal(bytes, &profile)
-	if err != nil {
-		panic(err)
-	}
+	profile, err := model.GetProfileFromJson(actual.Data)
 	actual.Data = profile
 
 	if expected != actual {

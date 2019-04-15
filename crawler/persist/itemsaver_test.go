@@ -29,7 +29,12 @@ func TestSave(t *testing.T) {
 		},
 	}
 
-	err := save(expected)
+	client, err := elasticsearch.NewDefaultClient()
+	if err != nil {
+		panic(err)
+	}
+
+	err = save(client, "crawler", expected)
 	if err != nil {
 		panic(err)
 	}
@@ -37,13 +42,12 @@ func TestSave(t *testing.T) {
 	query := "_id:" + expected.Id
 	fmt.Printf("query is %s\n", query)
 
-	es, err := elasticsearch.NewDefaultClient()
-	response, err := es.Search(
-		es.Search.WithContext(context.Background()),
-		es.Search.WithQuery(query),
-		es.Search.WithIndex("crawler"),
-		es.Search.WithDocumentType(expected.Type),
-		es.Search.WithPretty(),
+	response, err := client.Search(
+		client.Search.WithContext(context.Background()),
+		client.Search.WithQuery(query),
+		client.Search.WithIndex("crawler"),
+		client.Search.WithDocumentType(expected.Type),
+		client.Search.WithPretty(),
 	)
 	defer response.Body.Close()
 

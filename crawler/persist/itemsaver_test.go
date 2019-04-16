@@ -34,10 +34,9 @@ func TestSave(t *testing.T) {
 		panic(err)
 	}
 	saver := ElasticSaver{
-		Client: client,
-		Index:  "crawler_test",
+		Index: "crawler_test",
 	}
-	saver.Save(expected)
+	saver.Save(client, expected)
 
 	query := "_id:" + expected.Id
 	fmt.Printf("query is %s\n", query)

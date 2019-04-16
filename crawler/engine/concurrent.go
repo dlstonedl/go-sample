@@ -1,5 +1,7 @@
 package engine
 
+import "github.com/elastic/go-elasticsearch/v7"
+
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
@@ -19,7 +21,8 @@ type ReadyNotifier interface {
 }
 
 type Saver interface {
-	Save(Item)
+	Save(*elasticsearch.Client, Item)
+	CreateClientPool() chan *elasticsearch.Client
 }
 
 var parsedUrl = make(map[string]bool)
@@ -42,8 +45,9 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	itemChan := make(chan Item)
+	clientChan := e.Saver.CreateClientPool()
 	for i := 0; i < e.SaverCount; i++ {
-		CreateSaver(itemChan, e.Saver)
+		CreateSaver(itemChan, clientChan, e.Saver)
 	}
 
 	for _, r := range seeds {
@@ -85,12 +89,12 @@ func CreateWorker(in chan Request,
 	}()
 }
 
-func CreateSaver(itemChan chan Item, saver Saver) {
+func CreateSaver(itemChan chan Item, clientChan chan *elasticsearch.Client, saver Saver) {
 	go func() {
 		for {
 			item := <-itemChan
-			saver.Save(item)
+			client := <-clientChan
+			saver.Save(client, item)
 		}
 	}()
-
 }

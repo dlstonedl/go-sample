@@ -23,7 +23,12 @@ var (
 	idRe        = regexp.MustCompile(`http://album.zhenai.com/u/([0-9]+)`)
 )
 
+var profileCount = 0
+
 func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
+	log.Printf("profileCount is #%d\n", profileCount)
+	profileCount++
+
 	profile := model.Profile{}
 	profile.Age = convertStringToInt(extractString(ageRe, contents))
 	profile.Marriage = extractString(marriageRe, contents)

@@ -34,7 +34,7 @@ func TestSave(t *testing.T) {
 		panic(err)
 	}
 
-	err = save(client, "crawler", expected)
+	err = save(client, "crawler_test", expected)
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +45,7 @@ func TestSave(t *testing.T) {
 	response, err := client.Search(
 		client.Search.WithContext(context.Background()),
 		client.Search.WithQuery(query),
-		client.Search.WithIndex("crawler"),
+		client.Search.WithIndex("crawler_test"),
 		client.Search.WithDocumentType(expected.Type),
 		client.Search.WithPretty(),
 	)

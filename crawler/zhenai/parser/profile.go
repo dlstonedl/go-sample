@@ -3,14 +3,16 @@ package parser
 import (
 	"github.com/dlstonedl/go-sample/crawler/engine"
 	"github.com/dlstonedl/go-sample/crawler/model"
+	"log"
 	"regexp"
+	"strconv"
 )
 
 var (
 	ageRe       = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+)岁</div>`)
 	marriageRe  = regexp.MustCompile(`<div class="m-btn purple"[^>]*>(未婚|离异)</div>`)
-	heightRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+cm)</div>`)
-	weightRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+kg)</div>`)
+	heightRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+)cm</div>`)
+	weightRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>([^<]+)kg</div>`)
 	genderRe    = regexp.MustCompile(`"genderString":"(男|女)士"`)
 	educationRe = regexp.MustCompile(`"educationString":"([^"]+)"`)
 	incomeRe    = regexp.MustCompile(`<div class="m-btn purple"[^>]*>月收入:([^<]+)</div>`)
@@ -23,10 +25,10 @@ var (
 
 func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
 	profile := model.Profile{}
-	profile.Age = extractString(ageRe, contents)
+	profile.Age = convertStringToInt(extractString(ageRe, contents))
 	profile.Marriage = extractString(marriageRe, contents)
-	profile.Height = extractString(heightRe, contents)
-	profile.Weight = extractString(weightRe, contents)
+	profile.Height = convertStringToInt(extractString(heightRe, contents))
+	profile.Weight = convertStringToInt(extractString(weightRe, contents))
 	profile.Gender = extractString(genderRe, contents)
 	profile.Education = extractString(educationRe, contents)
 	profile.Income = extractString(incomeRe, contents)
@@ -46,6 +48,21 @@ func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
 			},
 		},
 	}
+}
+
+func convertStringToInt(num string) int {
+	if num == "" {
+		return 0
+	}
+
+	i, err := strconv.Atoi(num)
+	if err != nil {
+		log.Panicf("num is %s, %v\n",
+			num, err)
+		return 0
+	}
+
+	return i
 }
 
 func extractString(re *regexp.Regexp, contents []byte) string {

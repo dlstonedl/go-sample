@@ -6,9 +6,9 @@ type Profile struct {
 	Name          string
 	City          string
 	Gender        string
-	Age           string
-	Height        string
-	Weight        string
+	Age           int
+	Height        int
+	Weight        int
 	Income        string
 	Marriage      string
 	Education     string

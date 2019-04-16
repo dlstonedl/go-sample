@@ -17,7 +17,7 @@ docker run -d -p 9200:9200 -e "discovery.type=single-node" elasticsearch:7.0.0
 
 ### elasticsearch:  
 http://localhost:9200  
-GET http://localhost:9200/crawler/_doc/{id}?pretty=true  
+GET http://localhost:9200/crawler/zhenai/{id}?pretty=true  
 GET http://localhost:9200/crawler/_search?pretty=true  
 
 ### architecture-diagram:   

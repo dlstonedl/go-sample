@@ -19,9 +19,9 @@ func TestSave(t *testing.T) {
 			Name:      "Name",
 			City:      "阿坝",
 			Gender:    "男",
-			Age:       "20",
-			Height:    "177cm",
-			Weight:    "60kg",
+			Age:       20,
+			Height:    177,
+			Weight:    60,
 			Income:    "3千以下",
 			Marriage:  "未婚",
 			Education: "高中及以下",
@@ -33,11 +33,11 @@ func TestSave(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
-	err = save(client, "crawler_test", expected)
-	if err != nil {
-		panic(err)
+	saver := ElasticSaver{
+		Client: client,
+		Index:  "crawler_test",
 	}
+	saver.Save(expected)
 
 	query := "_id:" + expected.Id
 	fmt.Printf("query is %s\n", query)

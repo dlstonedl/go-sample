@@ -3,7 +3,8 @@ package engine
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
-	ItemChan    chan Item
+	Saver       Saver
+	SaverCount  int
 }
 
 type Scheduler interface {
@@ -15,6 +16,10 @@ type Scheduler interface {
 
 type ReadyNotifier interface {
 	WorkerReady(chan Request)
+}
+
+type Saver interface {
+	Save(Item)
 }
 
 var parsedUrl = make(map[string]bool)
@@ -36,6 +41,11 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 		CreateWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 
+	itemChan := make(chan Item)
+	for i := 0; i < e.SaverCount; i++ {
+		CreateSaver(itemChan, e.Saver)
+	}
+
 	for _, r := range seeds {
 		if isDuplication(r.Url) {
 			continue
@@ -47,7 +57,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			go func() { e.ItemChan <- item }()
+			go func() { itemChan <- item }()
 		}
 
 		for _, r := range result.Requests {
@@ -73,4 +83,14 @@ func CreateWorker(in chan Request,
 			out <- result
 		}
 	}()
+}
+
+func CreateSaver(itemChan chan Item, saver Saver) {
+	go func() {
+		for {
+			item := <-itemChan
+			saver.Save(item)
+		}
+	}()
+
 }

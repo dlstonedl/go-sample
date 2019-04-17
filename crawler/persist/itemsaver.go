@@ -11,56 +11,47 @@ import (
 	"strings"
 )
 
-type ElasticSaver struct {
-	clients     []*elasticsearch.Client
-	Index       string
-	ClientCount int
-}
-
-func (es *ElasticSaver) CreateClientPool() chan *elasticsearch.Client {
-	for i := 0; i < es.ClientCount; i++ {
-		client, err := elasticsearch.NewDefaultClient()
-		if err != nil {
-			panic(err)
-		}
-		es.clients = append(es.clients, client)
+func ItemSaver(index string) (chan engine.Item, error) {
+	client, err := elasticsearch.NewDefaultClient()
+	if err != nil {
+		return nil, err
 	}
 
-	clientChan := make(chan *elasticsearch.Client)
+	out := make(chan engine.Item)
 	go func() {
+		itemCount := 0
+		successCount := 0
+		failCount := 0
 		for {
-			for _, client := range es.clients {
-				clientChan <- client
+			item := <-out
+			log.Printf("ItemSaver item #%d, %v\n", itemCount, item)
+			itemCount++
+
+			err := saveTo(client, index, item)
+			if err != nil {
+				log.Printf("faile save #%d, %v, %v\n", failCount, item, err)
+				failCount++
+				continue
 			}
+
+			log.Printf("success save #%d\n", successCount)
+			successCount++
 		}
 	}()
-	return clientChan
+
+	return out, nil
 }
 
-//side-effect，thread-safe
-var itemBeforeCount = 0
-var itemAfterCount = 0
-
-func (es *ElasticSaver) Save(client *elasticsearch.Client, item engine.Item) {
-	log.Printf("ItemSaver item: #%d, %v",
-		itemBeforeCount, item)
-	itemBeforeCount++
-	err := saveItem(client, es.Index, item)
-	if err != nil {
-		fmt.Errorf("save item Error %v", item)
-	}
-
-	log.Printf("after save: #%d, %v",
-		itemAfterCount, item)
-	itemAfterCount++
-}
-
-func saveItem(client *elasticsearch.Client, index string, item engine.Item) (err error) {
+func saveTo(client *elasticsearch.Client, index string, item engine.Item) (err error) {
 	if item.Type == "" || item.Id == "" {
 		return fmt.Errorf("must apply Type and Id")
 	}
 
 	bytes, err := json.Marshal(item)
+	if err != nil {
+		return err
+	}
+
 	req := esapi.IndexRequest{
 		Index:        index,
 		DocumentType: item.Type,
@@ -68,7 +59,6 @@ func saveItem(client *elasticsearch.Client, index string, item engine.Item) (err
 		Body:         strings.NewReader(string(bytes)),
 		Refresh:      "true",
 	}
-
 	_, err = req.Do(context.Background(), client)
 	return err
 }

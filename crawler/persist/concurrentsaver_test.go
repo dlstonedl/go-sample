@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestSaveTo(t *testing.T) {
+func TestSaveItem(t *testing.T) {
 	expected := engine.Item{
 		Url:  "http://album.zhenai.com/u/1129992868",
 		Type: "zhenai",
@@ -33,7 +33,10 @@ func TestSaveTo(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	saveTo(client, "crawler_test", expected)
+	saver := ElasticSaver{
+		Index: "crawler_test",
+	}
+	saver.Save(client, expected)
 
 	query := "_id:" + expected.Id
 	fmt.Printf("query is %s\n", query)

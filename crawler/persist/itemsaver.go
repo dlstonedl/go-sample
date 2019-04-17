@@ -2,17 +2,14 @@ package persist
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/dlstonedl/go-sample/crawler/engine"
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/olivere/elastic"
 	"log"
-	"strings"
 )
 
 func ItemSaver(index string) (chan engine.Item, error) {
-	client, err := elasticsearch.NewDefaultClient()
+	client, err := elastic.NewClient(elastic.SetSniff(false))
 	if err != nil {
 		return nil, err
 	}
@@ -42,23 +39,17 @@ func ItemSaver(index string) (chan engine.Item, error) {
 	return out, nil
 }
 
-func saveTo(client *elasticsearch.Client, index string, item engine.Item) (err error) {
+func saveTo(client *elastic.Client, index string, item engine.Item) error {
 	if item.Type == "" || item.Id == "" {
 		return fmt.Errorf("must apply Type and Id")
 	}
 
-	bytes, err := json.Marshal(item)
-	if err != nil {
-		return err
-	}
+	_, err := client.Index().
+		Index(index).
+		Type(item.Type).
+		Id(item.Id).
+		BodyJson(item).
+		Do(context.Background())
 
-	req := esapi.IndexRequest{
-		Index:        index,
-		DocumentType: item.Type,
-		DocumentID:   item.Id,
-		Body:         strings.NewReader(string(bytes)),
-		Refresh:      "true",
-	}
-	_, err = req.Do(context.Background(), client)
 	return err
 }

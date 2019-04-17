@@ -13,7 +13,8 @@ docker rm {containerId}
 docker logs {containerId}  
 docker rmi {imageId}  
 
-docker run -d -p 9200:9200 -e "discovery.type=single-node" elasticsearch:7.0.0  
+docker pull elasticsearch:6.7.1
+docker run -d -p 9200:9200 elasticsearch:6.7.1  
 
 ### elasticsearch:  
 http://localhost:9200  

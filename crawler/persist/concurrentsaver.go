@@ -2,13 +2,10 @@ package persist
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/dlstonedl/go-sample/crawler/engine"
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/olivere/elastic"
 	"log"
-	"strings"
 )
 
 type ElasticSaver struct {
@@ -16,17 +13,17 @@ type ElasticSaver struct {
 	ClientCount int
 }
 
-func (es *ElasticSaver) CreateClientPool() chan *elasticsearch.Client {
-	var clients []*elasticsearch.Client
+func (es *ElasticSaver) CreateClientPool() chan *elastic.Client {
+	var clients []*elastic.Client
 	for i := 0; i < es.ClientCount; i++ {
-		client, err := elasticsearch.NewDefaultClient()
+		client, err := elastic.NewClient(elastic.SetSniff(false))
 		if err != nil {
 			panic(err)
 		}
 		clients = append(clients, client)
 	}
 
-	clientChan := make(chan *elasticsearch.Client)
+	clientChan := make(chan *elastic.Client)
 	go func() {
 		for {
 			for _, client := range clients {
@@ -42,7 +39,7 @@ var itemBeforeCount = 0
 var successCount = 0
 var failCount = 0
 
-func (es *ElasticSaver) Save(client *elasticsearch.Client, item engine.Item) {
+func (es *ElasticSaver) Save(client *elastic.Client, item engine.Item) {
 	log.Printf("ItemSaver item: #%d, %v\n", itemBeforeCount, item)
 	itemBeforeCount++
 
@@ -57,24 +54,17 @@ func (es *ElasticSaver) Save(client *elasticsearch.Client, item engine.Item) {
 	successCount++
 }
 
-func saveItem(client *elasticsearch.Client, index string, item engine.Item) (err error) {
+func saveItem(client *elastic.Client, index string, item engine.Item) error {
 	if item.Type == "" || item.Id == "" {
 		return fmt.Errorf("must apply Type and Id")
 	}
 
-	bytes, err := json.Marshal(item)
-	if err != nil {
-		return err
-	}
+	_, err := client.Index().
+		Index(index).
+		Type(item.Type).
+		Id(item.Id).
+		BodyJson(item).
+		Do(context.Background())
 
-	req := esapi.IndexRequest{
-		Index:        index,
-		DocumentType: item.Type,
-		DocumentID:   item.Id,
-		Body:         strings.NewReader(string(bytes)),
-		Refresh:      "true",
-	}
-
-	_, err = req.Do(context.Background(), client)
 	return err
 }

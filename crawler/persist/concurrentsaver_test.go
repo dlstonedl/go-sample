@@ -3,10 +3,9 @@ package persist
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/dlstonedl/go-sample/crawler/engine"
 	"github.com/dlstonedl/go-sample/crawler/model"
-	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/olivere/elastic"
 	"testing"
 )
 
@@ -29,7 +28,7 @@ func TestSaveItem(t *testing.T) {
 		},
 	}
 
-	client, err := elasticsearch.NewDefaultClient()
+	client, err := elastic.NewClient(elastic.SetSniff(false))
 	if err != nil {
 		panic(err)
 	}
@@ -38,33 +37,14 @@ func TestSaveItem(t *testing.T) {
 	}
 	saver.Save(client, expected)
 
-	query := "_id:" + expected.Id
-	fmt.Printf("query is %s\n", query)
-
-	response, err := client.Search(
-		client.Search.WithContext(context.Background()),
-		client.Search.WithQuery(query),
-		client.Search.WithIndex("crawler_test"),
-		client.Search.WithDocumentType(expected.Type),
-		client.Search.WithPretty(),
-	)
-	defer response.Body.Close()
-
-	var r map[string]interface{}
-	err = json.NewDecoder(response.Body).Decode(&r)
-	if err != nil {
-		panic(err)
-	}
-
-	source := r["hits"].(map[string]interface{})["hits"].([]interface{})[0].(map[string]interface{})["_source"].(map[string]interface{})
-
-	bytes, err := json.Marshal(source)
-	if err != nil {
-		panic(err)
-	}
+	response, err := client.Get().
+		Index("crawler_test").
+		Type(expected.Type).
+		Id(expected.Id).
+		Do(context.Background())
 
 	var actual engine.Item
-	err = json.Unmarshal(bytes, &actual)
+	err = json.Unmarshal([]byte(response.Source), &actual)
 	if err != nil {
 		panic(err)
 	}
@@ -75,5 +55,4 @@ func TestSaveItem(t *testing.T) {
 	if expected != actual {
 		t.Errorf("actual is %+v\n, expect %+v", actual, expected)
 	}
-
 }

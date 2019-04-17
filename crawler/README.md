@@ -1,8 +1,7 @@
 ### go：  
 go get golang.org/x/text    
 go get golang.org/x/net/html  
-
-git clone --branch 7.x https://github.com/elastic/go-elasticsearch.git $GOPATH/src/github.com/elastic/go-elasticsearch/v7  
+go get github.com/olivere/elastic/  
 
 #### docker:    
 docker ps -a  

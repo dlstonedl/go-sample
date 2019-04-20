@@ -13,7 +13,13 @@ docker logs {containerId}
 docker rmi {imageId}  
 
 docker pull elasticsearch:6.7.1
-docker run -d -p 9200:9200 elasticsearch:6.7.1  
+docker run -d -p 9200:9200 elasticsearch:6.7.1
+http://localhost:9200  
+
+docker pull kibana:6.7.1
+http://localhost:5601
+
+docker-compose up &
 
 ### elasticsearch:  
 http://localhost:9200  

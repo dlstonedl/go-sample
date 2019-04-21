@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestSaveTo(t *testing.T) {
+func TestSave(t *testing.T) {
 	expected := engine.Item{
 		Url:  "http://album.zhenai.com/u/1129992868",
 		Type: "zhenai",
@@ -32,7 +32,7 @@ func TestSaveTo(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	saveTo(client, "crawler_test", expected)
+	save(client, "crawler_test", expected)
 
 	response, err := client.Get().
 		Index("crawler_test").
@@ -60,5 +60,4 @@ func TestSaveTo(t *testing.T) {
 	if expected != actual {
 		t.Errorf("actual is %+v\n, expect %+v", actual, expected)
 	}
-
 }

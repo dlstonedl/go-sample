@@ -1,16 +1,24 @@
 package engine
 
+import "log"
+
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
-	ItemChan    chan Item
+	Saver       Saver
 }
 
 type Scheduler interface {
 	ReadyNotifier
 	Submit(Request)
 	WorkerChan() chan Request
+	Save(Item)
+	ItemChan() chan Item
 	Run()
+}
+
+type Saver interface {
+	ItemSaver(Item) error
 }
 
 type ReadyNotifier interface {
@@ -36,6 +44,8 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 		CreateWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 
+	CreateSaver(e.Scheduler.ItemChan(), e.Saver)
+
 	for _, r := range seeds {
 		if isDuplication(r.Url) {
 			continue
@@ -47,7 +57,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			go func() { e.ItemChan <- item }()
+			e.Scheduler.Save(item)
 		}
 
 		for _, r := range result.Requests {
@@ -73,4 +83,29 @@ func CreateWorker(in chan Request,
 			out <- result
 		}
 	}()
+}
+
+func CreateSaver(out chan Item, saver Saver) {
+	go func() {
+		itemCount := 0
+		successCount := 0
+		failCount := 0
+
+		for {
+			item := <-out
+			log.Printf("ItemSaver item #%d, %v\n", itemCount, item)
+			itemCount++
+
+			err := saver.ItemSaver(item)
+			if err != nil {
+				log.Printf("faile save #%d, %v, %v\n", failCount, item, err)
+				failCount++
+				continue
+			}
+
+			log.Printf("success save #%d\n", successCount)
+			successCount++
+		}
+	}()
+
 }

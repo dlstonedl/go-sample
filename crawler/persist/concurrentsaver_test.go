@@ -28,15 +28,17 @@ func TestSaveItem(t *testing.T) {
 		},
 	}
 
+	pool := ClientPool{}
+	saver := CurrentSaver{
+		Index:    "crawler_test",
+		esClient: pool.GetPoolClient,
+	}
+	saver.ItemSaver(expected)
+
 	client, err := elastic.NewClient(elastic.SetSniff(false))
 	if err != nil {
 		panic(err)
 	}
-	saver := ElasticSaver{
-		Index: "crawler_test",
-	}
-	saver.Save(client, expected)
-
 	response, err := client.Get().
 		Index("crawler_test").
 		Type(expected.Type).

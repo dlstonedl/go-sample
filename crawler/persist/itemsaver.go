@@ -10,12 +10,7 @@ import (
 )
 
 type EsRepo struct {
-	EsClient EsClient
-}
-
-type EsClient interface {
-	Init()
-	GetEsClient() *elastic.Client
+	ClientPool ClientPool
 }
 
 //no thread safe
@@ -27,7 +22,7 @@ func (s *EsRepo) SaveItem(item engine.Item) error {
 	log.Printf("ItemSaver item #%d, %v\n", itemCount, item)
 	itemCount++
 
-	err := save(s.EsClient.GetEsClient(), config.ElasticIndex, item)
+	err := save(s.ClientPool.GetEsClient(), config.ElasticIndex, item)
 	if err != nil {
 		log.Printf("faile save #%d, %v, %v\n", failCount, item, err)
 		failCount++

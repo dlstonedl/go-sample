@@ -8,15 +8,17 @@ import (
 )
 
 func main() {
-	single := persist.SingleClient{}
-	single.Init()
+	pool := persist.ClientPool{
+		ClientCount: 1,
+	}
+	pool.Init()
 
 	e := engine.ConcurrentEngine{
 		Scheduler:   &scheduler.QueueScheduler{},
 		WorkerCount: 100,
 		SaverCount:  1,
 		Repo: &persist.EsRepo{
-			EsClient: &single,
+			ClientPool: pool,
 		},
 	}
 

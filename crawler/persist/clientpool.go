@@ -1,6 +1,9 @@
 package persist
 
-import "github.com/olivere/elastic"
+import (
+	"github.com/dlstonedl/go-sample/crawler/config"
+	"github.com/olivere/elastic"
+)
 
 type ClientPool struct {
 	ClientCount int
@@ -8,9 +11,7 @@ type ClientPool struct {
 }
 
 func (c *ClientPool) Init() {
-	if c.ClientCount == 0 {
-		c.ClientCount = 3
-	}
+	c.ClientCount = config.ClientPoolSize
 
 	var clients []*elastic.Client
 	for i := 0; i < c.ClientCount; i++ {
@@ -31,6 +32,6 @@ func (c *ClientPool) Init() {
 	}()
 }
 
-func (c *ClientPool) GetPoolClient() *elastic.Client {
+func (c *ClientPool) GetEsClient() *elastic.Client {
 	return <-c.clientChan
 }

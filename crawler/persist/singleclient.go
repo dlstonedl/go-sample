@@ -15,6 +15,6 @@ func (s *SingleClient) Init() {
 	s.client = client
 }
 
-func (s *SingleClient) GetSingleClient() *elastic.Client {
+func (s *SingleClient) GetEsClient() *elastic.Client {
 	return s.client
 }

@@ -7,6 +7,15 @@ import (
 type QueueScheduler struct {
 	requestChan chan engine.Request
 	workerChan  chan chan engine.Request
+	itemChan    chan engine.Item
+}
+
+func (s *QueueScheduler) Save(item engine.Item) {
+	go func() { s.itemChan <- item }()
+}
+
+func (s *QueueScheduler) ItemChan() chan engine.Item {
+	return s.itemChan
 }
 
 func (s *QueueScheduler) WorkerChan() chan engine.Request {
@@ -24,6 +33,7 @@ func (s *QueueScheduler) WorkerReady(w chan engine.Request) {
 func (s *QueueScheduler) Run() {
 	s.requestChan = make(chan engine.Request)
 	s.workerChan = make(chan chan engine.Request)
+	s.itemChan = make(chan engine.Item)
 
 	go func() {
 		var requestQ []engine.Request

@@ -15,7 +15,7 @@ func main() {
 		Scheduler:   &scheduler.QueueScheduler{},
 		WorkerCount: 100,
 		SaverCount:  1,
-		Save: &persist.EsSave{
+		Repo: &persist.EsRepo{
 			EsClient: &single,
 		},
 	}

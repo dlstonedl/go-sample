@@ -4,7 +4,7 @@ type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
 	SaverCount  int
-	Save        Save
+	Repo        Repo
 }
 
 type Scheduler interface {
@@ -16,8 +16,8 @@ type Scheduler interface {
 	Run()
 }
 
-type Save interface {
-	ItemSave(Item) error
+type Repo interface {
+	SaveItem(Item) error
 }
 
 type ReadyNotifier interface {
@@ -44,7 +44,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	for i := 0; i < e.SaverCount; i++ {
-		CreateSaver(e.Scheduler.ItemChan(), e.Save)
+		CreateSaver(e.Scheduler.ItemChan(), e.Repo)
 	}
 
 	for _, r := range seeds {
@@ -86,11 +86,11 @@ func CreateWorker(in chan Request,
 	}()
 }
 
-func CreateSaver(out chan Item, save Save) {
+func CreateSaver(out chan Item, repo Repo) {
 	go func() {
 		for {
 			item := <-out
-			err := save.ItemSave(item)
+			err := repo.SaveItem(item)
 			if err != nil {
 				continue
 			}

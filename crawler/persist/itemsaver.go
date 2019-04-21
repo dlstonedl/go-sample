@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-type EsSave struct {
+type EsRepo struct {
 	EsClient EsClient
 }
 
@@ -23,7 +23,7 @@ var itemCount = 0
 var successCount = 0
 var failCount = 0
 
-func (s *EsSave) ItemSave(item engine.Item) error {
+func (s *EsRepo) SaveItem(item engine.Item) error {
 	log.Printf("ItemSaver item #%d, %v\n", itemCount, item)
 	itemCount++
 

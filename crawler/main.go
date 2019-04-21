@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/dlstonedl/go-sample/crawler/config"
 	"github.com/dlstonedl/go-sample/crawler/engine"
 	"github.com/dlstonedl/go-sample/crawler/persist"
 	"github.com/dlstonedl/go-sample/crawler/scheduler"
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	pool := persist.ClientPool{
-		ClientCount: 1,
+		ClientCount: config.ClientPoolSize,
 	}
 	pool.Init()
 

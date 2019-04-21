@@ -14,7 +14,8 @@ func main() {
 	e := engine.ConcurrentEngine{
 		Scheduler:   &scheduler.QueueScheduler{},
 		WorkerCount: 100,
-		Saver: &persist.EsSaver{
+		SaverCount:  1,
+		Save: &persist.EsSave{
 			EsClient: &single,
 		},
 	}

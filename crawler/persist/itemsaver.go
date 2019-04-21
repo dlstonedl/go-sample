@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-type EsSaver struct {
+type EsSave struct {
 	EsClient EsClient
 }
 
@@ -18,15 +18,24 @@ type EsClient interface {
 	GetEsClient() *elastic.Client
 }
 
-type GetEsClientFunc func() *elastic.Client
+//no thread safe
+var itemCount = 0
+var successCount = 0
+var failCount = 0
 
-func (s *EsSaver) ItemSaver(item engine.Item) error {
+func (s *EsSave) ItemSave(item engine.Item) error {
+	log.Printf("ItemSaver item #%d, %v\n", itemCount, item)
+	itemCount++
+
 	err := save(s.EsClient.GetEsClient(), config.ElasticIndex, item)
 	if err != nil {
-		log.Printf("fail save %v\n", item)
+		log.Printf("faile save #%d, %v, %v\n", failCount, item, err)
+		failCount++
 		return err
 	}
 
+	log.Printf("success save #%d\n", successCount)
+	successCount++
 	return nil
 }
 

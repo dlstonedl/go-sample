@@ -21,7 +21,7 @@ type EsClient interface {
 type GetEsClientFunc func() *elastic.Client
 
 func (s *SingleSaver) ItemSaver(item engine.Item) error {
-	err := save(s.EsClient.GetEsClient(), item)
+	err := save(s.EsClient.GetEsClient(), config.ElasticIndex, item)
 	if err != nil {
 		log.Printf("fail save %v\n", item)
 		return err
@@ -30,13 +30,13 @@ func (s *SingleSaver) ItemSaver(item engine.Item) error {
 	return nil
 }
 
-func save(client *elastic.Client, item engine.Item) error {
+func save(client *elastic.Client, index string, item engine.Item) error {
 	if item.Type == "" || item.Id == "" {
 		return fmt.Errorf("must apply Type and Id")
 	}
 
 	_, err := client.Index().
-		Index(config.ElasticIndex).
+		Index(index).
 		Type(item.Type).
 		Id(item.Id).
 		BodyJson(item).

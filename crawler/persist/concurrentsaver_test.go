@@ -29,9 +29,10 @@ func TestSaveItem(t *testing.T) {
 	}
 
 	pool := ClientPool{}
+	pool.Init()
 	saver := CurrentSaver{
 		Index:    "crawler_test",
-		esClient: pool.GetPoolClient,
+		EsClient: pool.GetPoolClient,
 	}
 	saver.ItemSaver(expected)
 

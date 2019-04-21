@@ -8,16 +8,16 @@ import (
 )
 
 func main() {
-
-	itemChan, err := persist.ItemSaver("crawler")
-	if err != nil {
-		panic(err)
-	}
+	single := persist.SingleClient{}
+	single.Init()
 
 	e := engine.ConcurrentEngine{
 		Scheduler:   &scheduler.QueueScheduler{},
 		WorkerCount: 100,
-		ItemChan:    itemChan,
+		Saver: &persist.SingleSaver{
+			Index:    "crawler",
+			EsClient: single.GetSingleClient,
+		},
 	}
 
 	//e := engine.ConcurrentEngine{

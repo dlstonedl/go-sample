@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-type SingleSaver struct {
+type EsSaver struct {
 	EsClient EsClient
 }
 
@@ -20,7 +20,7 @@ type EsClient interface {
 
 type GetEsClientFunc func() *elastic.Client
 
-func (s *SingleSaver) ItemSaver(item engine.Item) error {
+func (s *EsSaver) ItemSaver(item engine.Item) error {
 	err := save(s.EsClient.GetEsClient(), config.ElasticIndex, item)
 	if err != nil {
 		log.Printf("fail save %v\n", item)

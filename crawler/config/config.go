@@ -1,4 +1,6 @@
 package config
 
-const ElasticIndex = "crawler"
-const ClientPoolSize = 1
+const (
+	ElasticIndex   = "crawler"
+	ClientPoolSize = 1
+)
